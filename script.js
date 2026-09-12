@@ -81,14 +81,22 @@ loginForm.addEventListener('submit', async (e) => {
         if (data.success) {
             loginMessage.textContent = data.message
             loginMessage.style.color = 'green'
+            localStorage.setItem('accessToken', data.data.accessToken) //as this api is token based not cookies based so store the accessToken in local storage
+
+            showScreen('profile-screen')
+            fetchCurrentUser()
+
+
+            loginMessage.textContent = data.message
+            loginMessage.style.color = 'green'
         } else { //error is present in aray form in API
             if (data.errors && data.errors.length > 0) {
                 loginMessage.textContent = data.errors
                     .map((error) => Object.values(error)[0])
                     .join(", ");
             } else {
-              //if api don't contains any error then simply show the text message (This API contains 409 code which shows the  "User with email or username already exists" and has empty error)
-              loginMessage.textContent = data.message; //when error array is empty
+                //if api don't contains any error then simply show the text message (This API contains 409 code which shows the  "User with email or username already exists" and has empty error)
+                loginMessage.textContent = data.message; //when error array is empty
             }
             loginMessage.style.color = 'red'
         }
@@ -117,4 +125,33 @@ document.getElementById("go-to-login").addEventListener("click", (e) => {
     console.log("Login link clicked")
     showScreen("login-screen");
 });
+
+async function fetchCurrentUser() {
+    try {
+        const token = localStorage.getItem('accessToken') // take the token from local storage and stores into token then use it
+        
+        const res = await fetch(
+            "https://api.freeapi.app/api/v1/users/current-user", {
+                method: 'GET',
+                // credentials: 'include' //use for cookies based sessions
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            }
+        );
+
+        const data = await res.json()
+        console.log(data)
+
+        if (data.success) {
+            document.getElementById("profile-username").textContent = data.data.username;
+            document.getElementById("profile-email").textContent = data.data.email;
+            document.getElementById("profile-role").textContent = data.data.role;
+        } else {
+            console.error("Could not fetch current user:", data.message);
+        }
+    } catch (error) {
+        console.error("Something went wrong in fetching current user", error)
+    }
+}
 
