@@ -155,3 +155,30 @@ async function fetchCurrentUser() {
     }
 }
 
+const logoutButton = document.getElementById("logout-btn");
+logoutButton.addEventListener('click', async (e) => {
+    try {
+        const token = localStorage.getItem('accessToken')
+
+        const res = await fetch("https://api.freeapi.app/api/v1/users/logout", {
+            method: 'POST',
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
+        const data = await res.json()
+        console.log(data)
+
+        if (data.success) {
+            localStorage.removeItem("accessToken");
+            showScreen('login-screen')
+            const loginMessage = document.getElementById("login-message");
+            loginMessage.textContent = "LOGGED OUT. Please login again.";
+            loginMessage.style.color = "red";
+        }
+    } catch (error) {
+        console.error("Something is wrong in deleting the accessToken and showing the login screen", error)
+    }
+})
+
