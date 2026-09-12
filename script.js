@@ -126,6 +126,11 @@ document.getElementById("go-to-login").addEventListener("click", (e) => {
     showScreen("login-screen");
 });
 
+//display register screen if user click "Don't have an account?" in login screen. this will redirect them to go back to register screen
+document.getElementById("go-to-register").addEventListener("click", (e) => {
+    e.preventDefault();
+    showScreen("register-screen");
+});
 async function fetchCurrentUser() {
     try {
         const token = localStorage.getItem('accessToken') // take the token from local storage and stores into token then use it
